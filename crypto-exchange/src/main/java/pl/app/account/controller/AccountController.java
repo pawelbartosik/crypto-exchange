@@ -20,6 +20,7 @@ import pl.app.account.model.command.CreateAccountCommand;
 import pl.app.account.model.command.ExchangeCurrencyCommand;
 import pl.app.account.model.command.UpdateAccountCommand;
 import pl.app.account.model.dto.AccountDto;
+import pl.app.account.model.view.AccountView;
 import pl.app.account.service.AccountService;
 
 @RestController
@@ -37,9 +38,9 @@ public class AccountController {
     }
 
     @GetMapping("/{pesel}")
-    public ResponseEntity<AccountDto> getAccount(@PathVariable String pesel) {
+    public ResponseEntity<AccountView> getAccount(@PathVariable String pesel) {
         log.info("Getting account with pesel: {}", pesel);
-        return ResponseEntity.ok(accountService.getAccount(pesel));
+        return ResponseEntity.ok(accountService.getAccountView(pesel));
     }
 
     @PostMapping

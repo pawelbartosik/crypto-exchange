@@ -3,7 +3,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
-    <changeSet id="20240704-pawel-001" author="pawel">
+    <changeSet id="20250115-pawel-001" author="pawel">
         <sql>
             create table account
             (
@@ -16,7 +16,7 @@
             );
         </sql>
     </changeSet>
-    <changeSet id="20240706-pawel-001" author="pawel">
+    <changeSet id="20250115-pawel-002" author="pawel">
         <sql>
             create table sub_account
             (
@@ -30,4 +30,42 @@
             );
         </sql>
     </changeSet>
+<!--    <changeSet id="20250115-pawel-003" author="pawel">-->
+<!--        <sql>-->
+<!--            CREATE VIEW account_view AS-->
+<!--            SELECT-->
+<!--            a.id AS id,-->
+<!--            a.pesel AS pesel,-->
+<!--            a.name AS name,-->
+<!--            a.surname AS surname,-->
+<!--            sa.currency AS currency,-->
+<!--            sa.amount AS amount-->
+<!--            FROM-->
+<!--            account a-->
+<!--            LEFT JOIN-->
+<!--            sub_account sa-->
+<!--            ON-->
+<!--            a.pesel = sa.pesel;-->
+<!--        </sql>-->
+<!--    </changeSet>-->
+    <changeSet id="20250115-pawel-003" author="pawel">
+        <sql>
+            CREATE VIEW account_view AS
+            SELECT
+            a.id AS id,
+            a.pesel AS pesel,
+            a.name AS name,
+            a.surname AS surname,
+            GROUP_CONCAT(sa.currency || ': ' || sa.amount SEPARATOR '; ') AS sub_accounts
+            FROM
+            account a
+            LEFT JOIN
+            sub_account sa
+            ON
+            a.pesel = sa.pesel
+            GROUP BY
+            a.id, a.pesel, a.name, a.surname;
+        </sql>
+    </changeSet>
+<!--    chciałem JSON_ARRAYAGG ale h2 tego nie wspiera-->
 </databaseChangeLog>

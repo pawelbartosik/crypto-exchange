@@ -22,7 +22,9 @@ import pl.app.account.model.command.ExchangeCurrencyCommand;
 import pl.app.account.model.command.UpdateAccountCommand;
 import pl.app.account.model.dto.AccountDto;
 import pl.app.account.model.enums.CurrencyCode;
+import pl.app.account.model.view.AccountView;
 import pl.app.account.repository.AccountRepository;
+import pl.app.account.repository.AccountViewRepository;
 import pl.app.currency.service.CurrencyRateProvider;
 
 import java.math.BigDecimal;
@@ -32,6 +34,7 @@ import java.math.BigDecimal;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final AccountViewRepository accountViewRepository;
     private final CurrencyRateProvider currencyRateProvider;
 
     @Transactional(readOnly = true)
@@ -43,6 +46,11 @@ public class AccountService {
     public AccountDto getAccount(String pesel) {
         return accountRepository.findByPeselWithSubAccounts(pesel)
                 .map(AccountDto::fromAccount)
+                .orElseThrow(AccountNotFoundException::new);
+    }
+
+    public AccountView getAccountView(String pesel) {
+        return accountViewRepository.findByPesel(pesel)
                 .orElseThrow(AccountNotFoundException::new);
     }
 
