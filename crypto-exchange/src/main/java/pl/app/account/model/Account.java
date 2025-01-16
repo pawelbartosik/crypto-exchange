@@ -23,7 +23,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "pesel")
-@ToString
+@ToString(exclude = "subAccounts")
 @NoArgsConstructor
 public class Account {
 

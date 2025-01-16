@@ -3,6 +3,7 @@ package pl.app.account.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,8 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import pl.app.account.exception.SubAccountNotFoundException;
 import pl.app.account.model.enums.CurrencyCode;
 
@@ -33,7 +32,7 @@ public class SubAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pesel", referencedColumnName = "pesel", columnDefinition = "VARCHAR(11)")
     private Account account;
     @Enumerated(EnumType.STRING)

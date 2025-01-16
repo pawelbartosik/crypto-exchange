@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.app.account.model.command.CreateAccountCommand;
 import pl.app.account.model.command.ExchangeCurrencyCommand;
+import pl.app.account.model.command.TransactionCommand;
 import pl.app.account.model.command.UpdateAccountCommand;
 import pl.app.account.model.dto.AccountDto;
+import pl.app.account.model.view.AccountView;
 import pl.app.account.service.AccountService;
 
 @RestController
@@ -31,7 +33,7 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping
-    public ResponseEntity<Page<AccountDto>> getAccounts(@PageableDefault Pageable pageable) {
+    public ResponseEntity<Page<AccountView>> getAccounts(@PageableDefault Pageable pageable) {
         log.info("Getting all accounts");
         return ResponseEntity.ok(accountService.getAccounts(pageable));
     }
@@ -60,6 +62,19 @@ public class AccountController {
         accountService.deleteAccount(pesel);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{pesel}/deposit")
+    public ResponseEntity<AccountDto> deposit(@PathVariable String pesel, @RequestBody @Valid TransactionCommand command) {
+        log.info("Depositing money for account with pesel: {}", pesel);
+        return ResponseEntity.ok(accountService.deposit(pesel, command));
+    }
+
+    @PutMapping("/{pesel}/withdraw")
+    public ResponseEntity<AccountDto> withdraw(@PathVariable String pesel, @RequestBody @Valid TransactionCommand command) {
+        log.info("Withdrawing money for account with pesel: {}", pesel);
+        return ResponseEntity.ok(accountService.withdraw(pesel, command));
+    }
+
 
     @PutMapping("/{pesel}/exchange")
     public ResponseEntity<AccountDto> exchangeCurrency(@PathVariable String pesel, @RequestBody @Valid ExchangeCurrencyCommand command) {
