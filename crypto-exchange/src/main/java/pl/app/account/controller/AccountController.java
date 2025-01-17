@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.app.account.model.command.CreateAccountCommand;
+import pl.app.account.model.command.CreateSubAccountCommand;
 import pl.app.account.model.command.ExchangeCurrencyCommand;
 import pl.app.account.model.command.TransactionCommand;
 import pl.app.account.model.command.UpdateAccountCommand;
@@ -61,6 +62,12 @@ public class AccountController {
         log.info("Deleting account with pesel: {}", pesel);
         accountService.deleteAccount(pesel);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{pesel}/subaccount")
+    public ResponseEntity<AccountDto> createSubAccount(@PathVariable String pesel, @RequestBody @Valid CreateSubAccountCommand command) {
+        log.info("Creating subaccount for account with pesel: {}", pesel);
+        return ResponseEntity.ok(accountService.createSubAccount(pesel, command));
     }
 
     @PutMapping("/{pesel}/deposit")

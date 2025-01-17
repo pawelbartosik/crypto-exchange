@@ -10,6 +10,6 @@ import java.math.BigDecimal;
 public record TransactionCommand(
         @Pattern(regexp = "\\d{11}", message = "PESEL_MUST_BE_VALID")
         @ValidPeselAge String pesel,
-        @ValidCurrency String currency,
+        @ValidCurrency(name = "currency") String currency,
         @DecimalMin(value = "0", message = "AMOUNT_CANNOT_BE_NEGATIVE") BigDecimal amount) {
 }

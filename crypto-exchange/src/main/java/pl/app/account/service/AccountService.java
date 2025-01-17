@@ -15,19 +15,22 @@ import pl.app.account.exception.AccountNotEmptyException;
 import pl.app.account.exception.AccountNotFoundException;
 import pl.app.account.exception.AccountUpdateConflictException;
 import pl.app.account.exception.NotEnoughMoneyException;
+import pl.app.account.exception.SubAccountAlreadyExistException;
 import pl.app.account.exception.SubAccountNotFoundException;
 import pl.app.account.model.Account;
 import pl.app.account.model.SubAccount;
 import pl.app.account.model.command.CreateAccountCommand;
+import pl.app.account.model.command.CreateSubAccountCommand;
 import pl.app.account.model.command.ExchangeCurrencyCommand;
 import pl.app.account.model.command.TransactionCommand;
 import pl.app.account.model.command.UpdateAccountCommand;
 import pl.app.account.model.dto.AccountDto;
-import pl.app.account.model.enums.CurrencyCode;
 import pl.app.account.model.view.AccountView;
 import pl.app.account.repository.AccountRepository;
 import pl.app.account.repository.AccountViewRepository;
 import pl.app.account.repository.SubAccountRepository;
+import pl.app.currency.model.Currency;
+import pl.app.currency.service.CurrencyService;
 import pl.app.rate.service.CurrencyRateProvider;
 
 import java.math.BigDecimal;
@@ -40,6 +43,7 @@ public class AccountService {
     private final AccountViewRepository accountViewRepository;
     private final SubAccountRepository subAccountRepository;
     private final CurrencyRateProvider currencyRateProvider;
+    private final CurrencyService currencyService;
 
     @Transactional(readOnly = true)
     public Page<AccountView> getAccounts(Pageable pageable) {
@@ -57,7 +61,7 @@ public class AccountService {
     public AccountDto createAccount(CreateAccountCommand command) {
         try {
             return AccountDto.fromAccount(accountRepository
-                    .save(new Account(command.pesel(), command.name(), command.surname(), command.balanceUSD())));
+                    .save(new Account(command.pesel(), command.name(), command.surname())));
         } catch (Exception e) {
             throw new AccountAlreadyExistException();
         }
@@ -103,15 +107,25 @@ public class AccountService {
     }
 
     @Transactional
-    public AccountDto deposit(String pesel, TransactionCommand command) {
-        Account account = accountRepository.findByPeselWithSubAccounts(pesel)
-                .orElseThrow(AccountNotFoundException::new);
+    public AccountDto createSubAccount(String pesel, CreateSubAccountCommand command) {
+        Account account = getAccountAndVerifyWithCommand(pesel, command.pesel());
 
-        if (!account.getPesel().equals(command.pesel())) {
-            throw new AccountConflictException();
+        if (account.getSubAccounts().stream().anyMatch(subAccount -> subAccount.getCurrency().getCode().equals(command.currency()))) {
+            throw new SubAccountAlreadyExistException();
         }
 
-        SubAccount subAccount = subAccountRepository.findByPeselAndCurrencyWithLock(pesel, CurrencyCode.valueOf(command.currency()))
+        Currency currency = currencyService.getCurrency(command.currency());
+        SubAccount subAccount = new SubAccount(account, currency, BigDecimal.ZERO);
+        account.getSubAccounts().add(subAccount);
+
+        return AccountDto.fromAccount(account);
+    }
+
+    @Transactional
+    public AccountDto deposit(String pesel, TransactionCommand command) {
+        Account account = getAccountAndVerifyWithCommand(pesel, command.pesel());
+
+        SubAccount subAccount = subAccountRepository.findByPeselAndCurrencyWithLock(pesel, command.currency())
                 .orElseThrow(SubAccountNotFoundException::new);
 
         subAccount.setAmount(subAccount.getAmount().add(command.amount()));
@@ -121,14 +135,9 @@ public class AccountService {
 
     @Transactional
     public AccountDto withdraw(String pesel, TransactionCommand command) {
-        Account account = accountRepository.findByPeselWithSubAccounts(pesel)
-                .orElseThrow(AccountNotFoundException::new);
+        Account account = getAccountAndVerifyWithCommand(pesel, command.pesel());
 
-        if (!account.getPesel().equals(command.pesel())) {
-            throw new AccountConflictException();
-        }
-
-        SubAccount subAccount = subAccountRepository.findByPeselAndCurrencyWithLock(pesel, CurrencyCode.valueOf(command.currency()))
+        SubAccount subAccount = subAccountRepository.findByPeselAndCurrencyWithLock(pesel, command.currency())
                 .orElseThrow(SubAccountNotFoundException::new);
 
         if (subAccount.getAmount().compareTo(command.amount()) < 0) {
@@ -143,15 +152,10 @@ public class AccountService {
     @Transactional
     public AccountDto exchangeCurrency(String pesel, ExchangeCurrencyCommand command) {
         try {
-            Account account = accountRepository.findByPeselWithSubAccounts(pesel)
-                    .orElseThrow(AccountNotFoundException::new);
+            Account account = getAccountAndVerifyWithCommand(pesel, command.pesel());
 
-            if (!account.getPesel().equals(command.pesel())) {
-                throw new AccountConflictException();
-            }
-
-            int fromId = SubAccount.getSubAccount(account, CurrencyCode.valueOf(command.from())).getId();
-            int toId = SubAccount.getSubAccount(account, CurrencyCode.valueOf(command.to())).getId();
+            int fromId = SubAccount.getSubAccount(account, command.from()).getId();
+            int toId = SubAccount.getSubAccount(account, command.to()).getId();
             SubAccount from;
             SubAccount to;
 
@@ -167,7 +171,7 @@ public class AccountService {
                 throw new NotEnoughMoneyException();
             }
 
-            BigDecimal rate = currencyRateProvider.getExchangeRate(from.getCurrency(), to.getCurrency());
+            BigDecimal rate = currencyRateProvider.getExchangeRate(from.getCurrency().getCode(), to.getCurrency().getCode());
 
             from.setAmount(from.getAmount().subtract(command.amount()));
             to.setAmount(to.getAmount().add(command.amount().multiply(rate)));
@@ -176,5 +180,16 @@ public class AccountService {
         } catch (PessimisticLockException | LockTimeoutException e) {
             throw new AccountLockedException();
         }
+    }
+
+    private Account getAccountAndVerifyWithCommand(String pesel, String commandPesel) {
+        Account account = accountRepository.findByPeselWithSubAccounts(pesel)
+                .orElseThrow(AccountNotFoundException::new);
+
+        if (!account.getPesel().equals(commandPesel)) {
+            throw new AccountConflictException();
+        }
+
+        return account;
     }
 }

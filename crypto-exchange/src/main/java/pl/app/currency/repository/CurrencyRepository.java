@@ -14,4 +14,6 @@ public interface CurrencyRepository extends JpaRepository<Currency, Integer> {
     @Query("delete from Currency c where c.code = :code")
     int deleteByCode(String code);
 
+    boolean existsByCode(String code);
+
 }

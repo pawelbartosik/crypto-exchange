@@ -38,7 +38,7 @@ public class CurrencyController {
     @GetMapping("/{code}")
     public ResponseEntity<CurrencyDto> getCurrency(@PathVariable String code) {
         log.info("Getting currency with code: {}", code);
-        return ResponseEntity.ok(currencyService.getCurrency(code));
+        return ResponseEntity.ok(currencyService.getCurrencyDto(code));
     }
 
     @PostMapping

@@ -3,7 +3,6 @@ package pl.app.rate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import pl.app.account.model.enums.CurrencyCode;
 import pl.app.rate.exception.CurrencyConversionException;
 
 import java.math.BigDecimal;
@@ -17,7 +16,7 @@ public class CurrencyRateProvider {
 
     private final RestTemplate restTemplate;
 
-    public BigDecimal getExchangeRate(CurrencyCode fromCurrency, CurrencyCode toCurrency) {
+    public BigDecimal getExchangeRate(String fromCurrency, String toCurrency) {
         Map<String, Object> response = restTemplate.getForObject(
                 API_URL,
                 Map.class,
@@ -25,8 +24,8 @@ public class CurrencyRateProvider {
                 toCurrency
         );
 
-        if (response != null && response.containsKey(toCurrency.toString())) {
-            return new BigDecimal(response.get(toCurrency.toString()).toString());
+        if (response != null && response.containsKey(toCurrency)) {
+            return new BigDecimal(response.get(toCurrency).toString());
         } else {
             throw new CurrencyConversionException();
         }

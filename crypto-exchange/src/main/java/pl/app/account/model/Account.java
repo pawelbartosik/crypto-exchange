@@ -13,9 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import pl.app.account.model.enums.CurrencyCode;
 
-import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,14 +39,10 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private Set<SubAccount> subAccounts = new HashSet<>();
 
-    public Account(String pesel, String name, String surname, BigDecimal balanceUSD) {
+    public Account(String pesel, String name, String surname) {
         this.pesel = pesel;
         this.name = name;
         this.surname = surname;
-
-        new SubAccount(this, CurrencyCode.USD, new BigDecimal(String.valueOf(balanceUSD)));
-        new SubAccount(this, CurrencyCode.BTC, BigDecimal.ZERO);
-        new SubAccount(this, CurrencyCode.ETH, BigDecimal.ZERO);
     }
 
 }

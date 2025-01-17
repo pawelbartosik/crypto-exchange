@@ -1,8 +1,6 @@
 package pl.app.account.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import pl.app.account.exception.SubAccountNotFoundException;
-import pl.app.account.model.enums.CurrencyCode;
+import pl.app.currency.model.Currency;
 
 import java.math.BigDecimal;
 
@@ -35,14 +33,15 @@ public class SubAccount {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pesel", referencedColumnName = "pesel", columnDefinition = "VARCHAR(11)")
     private Account account;
-    @Enumerated(EnumType.STRING)
-    private CurrencyCode currency;
+    @ManyToOne
+    @JoinColumn(name = "currency", referencedColumnName = "code")
+    private Currency currency;
     private BigDecimal amount;
 
     @Version
     private long version;
 
-    public SubAccount(Account account, CurrencyCode currency, BigDecimal amount) {
+    public SubAccount(Account account, Currency currency, BigDecimal amount) {
         this.account = account;
         this.currency = currency;
         this.amount = amount;
@@ -50,10 +49,10 @@ public class SubAccount {
         this.account.getSubAccounts().add(this);
     }
 
-    public static SubAccount getSubAccount(Account account, CurrencyCode currency) {
+    public static SubAccount getSubAccount(Account account, String currency) {
         return account.getSubAccounts()
                 .stream()
-                .filter(subAccount -> subAccount.getCurrency().equals(currency))
+                .filter(subAccount -> subAccount.getCurrency().getCode().equals(currency))
                 .findFirst()
                 .orElseThrow(SubAccountNotFoundException::new);
     }

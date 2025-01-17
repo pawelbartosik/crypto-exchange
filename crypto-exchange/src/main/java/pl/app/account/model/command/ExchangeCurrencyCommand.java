@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 public record ExchangeCurrencyCommand(@Pattern(regexp = "\\d{11}", message = "PESEL_MUST_BE_VALID")
                                       @ValidPeselAge String pesel,
-                                      @ValidCurrency String from,
-                                      @ValidCurrency String to,
+                                      @ValidCurrency(name = "currency") String from,
+                                      @ValidCurrency(name = "currency") String to,
                                       @DecimalMin(value = "0", inclusive = false, message = "AMOUNT_MUST_POSITIVE") BigDecimal amount) {
 }

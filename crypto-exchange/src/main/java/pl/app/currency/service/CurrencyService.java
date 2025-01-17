@@ -1,6 +1,8 @@
 package pl.app.currency.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,9 +29,16 @@ public class CurrencyService {
     }
 
     @Transactional(readOnly = true)
-    public CurrencyDto getCurrency(String code) {
+    @Cacheable(cacheNames = "currencies", key = "#code")
+    public CurrencyDto getCurrencyDto(String code) {
         return currencyRepository.findByCode(code)
                 .map(CurrencyDto::fromCurrency)
+                .orElseThrow(CurrencyNotFoundException::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Currency getCurrency(String code) {
+        return currencyRepository.findByCode(code)
                 .orElseThrow(CurrencyNotFoundException::new);
     }
 
@@ -43,9 +52,9 @@ public class CurrencyService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "currencies", key = "#code")
     public CurrencyDto updateCurrencyData(String code, UpdateCurrencyCommand command) {
-        Currency currency = currencyRepository.findByCode(code)
-                .orElseThrow(CurrencyNotFoundException::new);
+        Currency currency = getCurrency(code);
 
         if (!currency.getName().equals(command.previousName()) || !currency.getCode().equals(command.previousCode())) {
             throw new CurrencyConflictException();
@@ -58,6 +67,7 @@ public class CurrencyService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = "currencies", key = "#code")
     public void deleteCurrency(String code) {
         if (currencyRepository.deleteByCode(code) < 1) {
             throw new CurrencyNotFoundException();

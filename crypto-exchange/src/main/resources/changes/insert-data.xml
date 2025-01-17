@@ -20,53 +20,53 @@
             <column name="surname" value="Sienkiewicz"/>
         </insert>
     </changeSet>
-    <changeSet id="20240706-pawel-001" author="pawel">
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Maria'"/>
-            <column name="currency" value="USD"/>
-            <column name="amount" value="1000"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Maria'"/>
-            <column name="currency" value="BTC"/>
-            <column name="amount" value="0"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Maria'"/>
-            <column name="currency" value="ETH"/>
-            <column name="amount" value="0"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Jan'"/>
-            <column name="currency" value="USD"/>
-            <column name="amount" value="2000"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Jan'"/>
-            <column name="currency" value="BTC"/>
-            <column name="amount" value="2000"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Jan'"/>
-            <column name="currency" value="ETH"/>
-            <column name="amount" value="2000"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Magda'"/>
-            <column name="currency" value="USD"/>
-            <column name="amount" value="3000"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Magda'"/>
-            <column name="currency" value="BTC"/>
-            <column name="amount" value="0"/>
-        </insert>
-        <insert tableName="sub_account">
-            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Magda'"/>
-            <column name="currency" value="ETH"/>
-            <column name="amount" value="0"/>
-        </insert>
-    </changeSet>
+<!--    <changeSet id="20240706-pawel-001" author="pawel">-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Maria'"/>-->
+<!--            <column name="currency" value="USD"/>-->
+<!--            <column name="amount" value="1000"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Maria'"/>-->
+<!--            <column name="currency" value="BTC"/>-->
+<!--            <column name="amount" value="0"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Maria'"/>-->
+<!--            <column name="currency" value="ETH"/>-->
+<!--            <column name="amount" value="0"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Jan'"/>-->
+<!--            <column name="currency" value="USD"/>-->
+<!--            <column name="amount" value="2000"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Jan'"/>-->
+<!--            <column name="currency" value="BTC"/>-->
+<!--            <column name="amount" value="2000"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Jan'"/>-->
+<!--            <column name="currency" value="ETH"/>-->
+<!--            <column name="amount" value="2000"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Magda'"/>-->
+<!--            <column name="currency" value="USD"/>-->
+<!--            <column name="amount" value="3000"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Magda'"/>-->
+<!--            <column name="currency" value="BTC"/>-->
+<!--            <column name="amount" value="0"/>-->
+<!--        </insert>-->
+<!--        <insert tableName="sub_account">-->
+<!--            <column name="pesel" valueComputed="select a.pesel from account a where a.name = 'Magda'"/>-->
+<!--            <column name="currency" value="ETH"/>-->
+<!--            <column name="amount" value="0"/>-->
+<!--        </insert>-->
+<!--    </changeSet>-->
     <changeSet id="20250117-pawel-002" author="pawel">
         <insert tableName="currency">
             <column name="name" value="US Dollar"/>

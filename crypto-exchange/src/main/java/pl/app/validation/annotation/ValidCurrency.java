@@ -18,4 +18,6 @@ public @interface ValidCurrency {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    String name();
 }
