@@ -28,7 +28,7 @@ import pl.app.account.model.view.AccountView;
 import pl.app.account.repository.AccountRepository;
 import pl.app.account.repository.AccountViewRepository;
 import pl.app.account.repository.SubAccountRepository;
-import pl.app.currency.service.CurrencyRateProvider;
+import pl.app.rate.service.CurrencyRateProvider;
 
 import java.math.BigDecimal;
 
@@ -150,12 +150,18 @@ public class AccountService {
                 throw new AccountConflictException();
             }
 
-            SubAccount from = SubAccount.getSubAccount(account, CurrencyCode.valueOf(command.from()));
-            SubAccount to = SubAccount.getSubAccount(account, CurrencyCode.valueOf(command.to()));
-            SubAccount first = from.getId() < to.getId() ? from : to;
-            SubAccount second = from.getId() < to.getId() ? to : from;
-            subAccountRepository.findByIdWithLock(first.getId());
-            subAccountRepository.findByIdWithLock(second.getId());
+            int fromId = SubAccount.getSubAccount(account, CurrencyCode.valueOf(command.from())).getId();
+            int toId = SubAccount.getSubAccount(account, CurrencyCode.valueOf(command.to())).getId();
+            SubAccount from;
+            SubAccount to;
+
+            if (fromId < toId) {
+                from = subAccountRepository.findByIdWithLock(fromId).orElseThrow(SubAccountNotFoundException::new);
+                to = subAccountRepository.findByIdWithLock(toId).orElseThrow(SubAccountNotFoundException::new);
+            } else {
+                to = subAccountRepository.findByIdWithLock(toId).orElseThrow(SubAccountNotFoundException::new);
+                from = subAccountRepository.findByIdWithLock(fromId).orElseThrow(SubAccountNotFoundException::new);
+            }
 
             if (from.getAmount().compareTo(command.amount()) < 0) {
                 throw new NotEnoughMoneyException();

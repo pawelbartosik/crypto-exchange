@@ -1,10 +1,10 @@
-package pl.app.currency.service;
+package pl.app.rate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.app.account.model.enums.CurrencyCode;
-import pl.app.currency.exception.CurrencyConversionException;
+import pl.app.rate.exception.CurrencyConversionException;
 
 import java.math.BigDecimal;
 import java.util.Map;

@@ -16,5 +16,5 @@ public interface SubAccountRepository extends JpaRepository<SubAccount, Integer>
 
     @Lock(LockModeType.PESSIMISTIC_FORCE_INCREMENT)
     @Query("SELECT s FROM SubAccount s WHERE s.id = :id")
-    void findByIdWithLock(int id);
+    Optional<SubAccount> findByIdWithLock(int id);
 }

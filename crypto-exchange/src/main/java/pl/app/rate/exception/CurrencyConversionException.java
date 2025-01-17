@@ -1,4 +1,4 @@
-package pl.app.currency.exception;
+package pl.app.rate.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

@@ -67,4 +67,18 @@
             <column name="amount" value="0"/>
         </insert>
     </changeSet>
+    <changeSet id="20250117-pawel-002" author="pawel">
+        <insert tableName="currency">
+            <column name="name" value="US Dollar"/>
+            <column name="code" value="USD"/>
+        </insert>
+        <insert tableName="currency">
+            <column name="name" value="Bitcoin"/>
+            <column name="code" value="BTC"/>
+        </insert>
+        <insert tableName="currency">
+            <column name="name" value="Ethereum"/>
+            <column name="code" value="ETH"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
